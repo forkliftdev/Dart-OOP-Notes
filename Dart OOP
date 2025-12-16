@@ -1,0 +1,2156 @@
+# Dart OOP
+## Introduction
+Object-Oriented Programming (OOP) in Dart is a programming paradigm that organizes code into **classes and objects**. A class defines a blueprint for creating objects that encapsulate **data (fields)** and **behaviour (methods)**. Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymorphism**, and **abstraction**. Encapsulation hides internal details and exposes only necessary functionality using access control. Inheritance allows one class to reuse and extend another class’s features using the `extends` keyword. Polymorphism enables a single interface to represent multiple types, often through method overriding. Abstraction simplifies complex systems by defining essential behaviour with **abstract classes** or **interfaces**. Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
+
+## Classes & Objects
+A blueprint or template that defines the structure and behavior of objects. It contains fields (data) and methods (behavior). An instance of a class that represents a specific entity (e.g., `Student`, `Book`, `Car`). A typical class definition contains
+`class` keyword followed by naming with PascalCase(e.g., `Student`, `PersonData`).
+
+Can Contain:
+
+-   Fields/Variables can be instance or static  
+-   Methods can be instance or static 
+-   Constructors, Getters, Setters
+    
+``` dart
+class Student {
+  String? name;
+  int? age;
+
+  void display() {
+    print('Name: $name, Age: $age');
+  }
+}
+
+Student s1 = Student(); // Object creation or instantiation
+```
+  
+**Behind the Scenes (Object Invocation)**
+
+Dart allocates memory for the object. Fields are initialized (default null if nullable). The reference variable (e.g., _s1_) stores the memory address of the object. When calling methods like _s1.display()_, the function executes for that specific object instance.
+``` dart
+class Person {
+  String? name;
+  int? age;
+
+  void showData() {
+    print('Name: $name, Age: $age');
+  }
+}
+
+void main() {
+  Person p1 = Person();
+  p1.name = 'Arnab';
+  p1.age = 25;
+  p1.showData(); // Output: Name: Arnab, Age: 25
+}
+```
+  
+**Key points**
+
+Class Contents and Code Placement: A class can have fields, methods, constructors, and getters/setters. You cannot write executable code directly inside the class body.
+``` dart
+class Person {
+  String name = '';
+  int age = 0;
+
+  // Constructor
+  Person(this.name, this.age);
+
+  // Method
+  void showInfo() {
+    print('Name: $name, Age: $age');
+  }
+}
+```
+
+Member Access: From outside of a class access through an object. From inside of a class access directly.
+``` dart
+void main() {
+  var p1 = Person('Alice', 25);
+  p1.showInfo(); // Accessing method using object
+}
+
+// Inside class (no object needed):
+void showInfo() {
+  print('Name: $name'); // Accessing directly
+}
+```  
+Memory Allocation: Each object has its own copy of instance variables, but methods are shared.
+``` dart
+var p1 = Person('Arnab', 20);
+var p2 = Person('Ankur', 30);
+p1.name = 'Updated';
+print(p2.name); // Still 'Ankur' - separate copies
+```
+
+Object Identity: Each object has a unique memory address (hash code).
+``` dart
+print(p1.hashCode);
+print(p2.hashCode); // Different values
+```
+Public and Private Members: Use _ to make members private within a file.
+``` dart
+class Student {
+  String _id = 'S001'; // Private member
+  void showId() => print(_id);
+}
+```
+
+Naming Restrictions: Members cannot share names with the class or with each other.
+``` dart
+class Car {
+  String model = '';
+  void display() {} // Valid
+  int Car = 5; // Invalid - cannot match class name
+}
+```
+ 
+ Object vs. Reference: A reference variable holds the memory address of the actual object.
+``` dart
+var s1 = Student();
+var s2 = s1; // s2 points to same object as s1
+print(identical(s1, s2)); // true
+```
+No Function Overloading: Multiple methods with the same name are not allowed.
+``` dart
+class MathOps {
+  int add(int a, int b) => a + b;
+  int add(int a, int b, int c) => a + b + c; // Not allowed
+}
+```
+
+Class Inheritance: Every class automatically extends object.
+``` dart
+class Animal {}
+
+void main() {
+  var a = Animal();
+  print(a.toString()); // toString() comes from object class
+}
+```
+  
+
+Encapsulation Principle: Encapsulation hides internal details and exposes only the necessary parts.
+``` dart
+class BankAccount {
+  double _balance = 0; // private
+  void deposit(double amount) => _balance += amount;
+  double get balance => _balance; // controlled access
+}
+
+void main() {
+  var acc = BankAccount();
+  acc.deposit(100);
+  print(acc.balance); // Access via getter
+}
+```
+**Public & Private Members**
+- Each Dart file is a library by default. Private members are visible only within that library.
+- Dart determines visibility based on files (libraries), not classes. There are no public or private keywords. A leading underscore `_` makes a member private to its file. 
+
+Public Members: Members without `_` are public. Can be used from any file or library.
+``` dart
+// person.dart
+class Person {
+  String name = 'Alice'; // Public member
+  void showName() => print(name);
+}
+
+// main.dart
+import 'person.dart';
+void main() {
+  var p = Person();
+  print(p.name); // Accessible — public
+  p.showName(); // Accessible
+}
+```
+Private Members: Members starting with `_` are private. Only accessible within the same file.
+``` dart
+// person.dart
+class Person {
+  String _id = 'P001'; // Private member
+  void _displayId() => print(_id);
+  void showPublicInfo() {
+    _displayId(); // Accessible inside same file
+  }
+}
+
+// main.dart
+import 'person.dart';
+void main() {
+  var p = Person();
+  print(p._id); // Error - private member
+  p._displayId(); // Error - not accessible
+  p.showPublicInfo(); // Works - accessed through public method
+}
+```  
+
+## Constructor
+A constructor is a special method invoked automatically when an object is created to handle its initialization.
+
+**Why Constructors**
+
+In Dart, when you use a separate method like `getData()` to initialize object variables, you must **manually call** it after creating each object. This can lead to mistakes if you forget to initialize required fields.
+
+To address this, Dart provides **constructors**, which automatically initialize class variables when an object is created. This ensures every object starts in a valid and consistent state.
+``` dart
+// Example Without Constructor
+class Person {
+  String? name;
+  int? age;
+  void getData(String n, int a) {
+    name = n;
+    age = a;
+  }
+
+  void showData() {
+    print('Name=$name');
+    print('Age=$age');
+  }
+}
+
+void main() {
+  Person p = Person();
+  p.getData('Arnab', 26);
+  p.showData();
+}
+``` 
+In this example, you must remember to call `getData()` to assign values. Forgetting to call it would leave `name` and `age` as `null`.
+``` dart
+class Person {
+  String? name;
+  int? age;
+  
+  // Constructor to initialize variables
+  Person(this.name, this.age);
+  void showData() {
+    print('Name=$name');
+    print('Age=$age');
+  }
+}
+
+void main() {
+  Person p = Person('Arnab', 26);
+  p.showData();
+}
+```
+  
+
+**Key Features of Constructors**
+
+- Constructors cannot be static:  `static Person() {} // Invalid: Constructors cannot be static`
+- Default Constructor: If you don’t define a constructor, Dart provides a default (empty) one automatically.
+``` dart
+class Person {
+  String? name;
+  int? age;
+}
+
+void main() {
+  var p = Person(); // Default constructor is used
+}
+```
+  
+- Syntax Simplification (Syntactic Sugar): You can initialize fields directly using `this.fieldName.`
+``` dart
+class Person {
+  String? name;
+  int? age;
+  Person(this.name, this.age); // shorthand for assignment
+}
+```
+ - Parameter Types: Constructors support **positional**, **named**, and **required named parameters**.
+``` dart
+// Positional
+class Person {
+  String? name;
+  int? age;
+  Person(this.name, this.age);
+}
+
+// Named
+class Student {
+  String? name;
+  int? roll;
+  Student({this.name, this.roll});
+}
+
+// Required Named
+class Employee {
+  String? name;
+  int? id;
+  Employee({required this.name, required this.id});
+}
+```
+- Overloading (Named Constructors): Dart does not support constructor overloading. Use named constructors instead.
+``` dart
+class Person {
+  String? name;
+  int? age;
+  Person(this.name, this.age); // Default constructor
+  Person.named(this.name); // Named constructor
+  Person.ageOnly(this.age); // Another named constructor
+}
+
+void main() {
+  var p1 = Person('Arnab', 26);
+  var p2 = Person.named('Rahul');
+  var p3 = Person.ageOnly(30);
+}
+```
+- Private Constructor: Prefix the constructor name with an underscore `_` to make it private to its library (file).
+``` dart
+class Database {
+  Database._(); // Private constructor
+  static final instance = Database._(); // Singleton pattern
+}
+```
+- Inheritance: Constructors are not inherited. A subclass must explicitly call a superclass constructor using `super`.
+``` dart
+class Person {
+  String name;
+  Person(this.name);
+}
+
+class Student extends Person {
+  int roll;
+  Student(this.roll, String name) : super(name); // Calls Person()
+}
+```
+  
+### Factory Constructor
+A factory constructor can return an existing instance or a new one. It must explicitly return an object. Used when object creation needs **control -** like returning an existing object, applying logic, or using a cache. A factory constructor is a special constructor defined with the `factory` keyword. It does not always create a new object, but returns an existing instance or a new instance explicitly.
+
+Core Principles
+
+-   Explicit Return: Must return an instance using `return`.   
+-   Non-Generative: Relies on other constructors for object creation.  
+-   No `this` Access: Cannot access instance members; can access static members.  
+-   No `super` Call: Cannot call a superclass constructor.
+
+| Use Case | Description | Example |
+| --- | --- | --- |
+| Factory Design Pattern | Return a subclass instance based on input. | Shape factory returns Triangle or Rectangle based on ShapeType |
+| Singleton Pattern | Ensure only one instance exists. | Factory constructor returns a single private static instance |
+| Late Initialization | Perform complex logic before object creation. | Generate a random password before calling constructor |
+| Return from Cache | Reuse existing objects from a cache. | Person factory checks static map for existing name instance |
+
+_**Factory design pattern**_
+``` dart
+enum ShapeType { triangle, rectangle }
+
+abstract class Shape {
+  factory Shape(ShapeType type) {
+    if (type == ShapeType.triangle) {
+      return Triangle();
+    } else {
+      return Rectangle();
+    }
+  }
+}
+
+class Triangle implements Shape {
+  void draw() => print('Triangle');
+}
+
+class Rectangle implements Shape {
+  void draw() => print('Rectangle');
+}
+```
+_**Singleton pattern**_ 
+``` dart
+class Singleton {
+  Singleton._internal(); // Private generative constructor
+  static final Singleton _instance = Singleton._internal();
+  factory Singleton() {
+    return _instance;
+  }
+}
+
+void main() {
+  var s1 = Singleton();
+  var s2 = Singleton();
+  print(identical(s1, s2)); // true - same instance
+}
+```
+_**Late initialization**_ 
+``` dart
+// Perform some logic (e.g., generate a value) before creating the object.
+import 'dart:math';
+
+class User {
+  final String username;
+  final String password;
+
+  // Private generative constructor
+  User._internal(this.username, this.password);
+
+  // Factory constructor with late initialization
+  factory User(String username) {
+    // Complex logic before creating object
+    String generatedPassword = 'PWD${Random().nextInt(1000)}';
+    return User._internal(username, generatedPassword);
+  }
+
+  void showInfo() {
+    print('Username: $username, Password: $password');
+  }
+}
+
+void main() {
+  var user1 = User('Alice');
+  var user2 = User('Bob');
+
+  user1.showInfo(); // Username: Alice, Password: PWD123 (random)
+  user2.showInfo(); // Username: Bob, Password: PWD987 (random)
+}
+/*
+Explanation: The factory constructor generates a password before calling the internal generative constructor.
+ */
+```
+_**Return from cache**_ 
+``` dart
+// Reuse an existing instance if it exists.
+class Person {
+  final String name;
+  static final Map<String, Person> _cache = {};
+  // Private generative constructor
+  Person._internal(this.name);
+
+  // Factory constructor returns cached instance
+
+  factory Person(String name) {
+    if (_cache.containsKey(name)) {
+      print('Returning cached instance for $name');
+
+      return _cache[name]!;
+    } else {
+      var person = Person._internal(name);
+      _cache[name] = person;
+      print('Creating new instance for $name');
+      return person;
+    }
+  }
+}
+
+void main() {
+  var p1 = Person('Alice'); // Creating new instance
+  var p2 = Person('Bob'); // Creating new instance
+  var p3 = Person('Alice'); // Returning cached instance
+
+  print(identical(p1, p3)); // true
+  print(identical(p1, p2)); // false
+}
+
+/*
+Explanation: The factory constructor checks a **static cache** and returns the existing instance if available, preventing duplicate object creation.
+*/
+```
+
+### Redirecting Constructor
+A redirecting constructor is a constructor that calls another constructor of the same class using the `this()` keyword in the initializer list. Its main goal is to avoid code duplication by routing multiple constructors with different parameters to a common main constructor that handles the shared initialization logic.
+``` dart
+class Point {
+double x, y;
+
+Point(this.x, this.y);
+
+Point.origin() : this(0, 0); // Redirecting constructor
+}
+
+void main() {
+var p1 = Point(3, 4);
+var p2 = Point.origin(); // Calls redirecting constructor
+}
+```
+| Rule | Description | Example |
+| --- | --- | --- |
+| Generative Only | Must be a generative constructor; cannot be a factory constructor. | `class Point { double x, y; Point(this.x, this.y); Point.origin() : this(0,0); }` |
+| No Body or Initializers | Cannot have a body `{}` or any initializer list (including `this.fieldName`). | `class Point { double x, y; Point(this.x, this.y); Point.origin() : this(0, 0); // no extra {} or initializers }` |
+| Single Call | Can only redirect to one constructor at a time. Chaining is allowed. | `class Point { double x, y; Point(this.x, this.y); Point.origin() : this(0,0); Point.unit() : this.origin(); // chain redirection }` |
+| No Recursion | Recursive redirection is not allowed (cannot call itself directly or indirectly). | `Invalid: Point.a() : this.b(); Point.b() : this.a();` |
+| const | If a redirecting constructor is declared `const`, the constructor it calls must also be `const`. | `class Point { final double x, y; const Point(this.x, this.y); const Point.origin() : this(0,0); }` |
+  
+Example: Bank Account Creation. You can create an account either with default balance or with custom balance. Instead of repeating code, you redirect constructors.
+``` dart
+class BankAccount {
+  String owner;
+  double balance;
+  // Main constructor
+  BankAccount(this.owner, this.balance);
+
+  // Redirecting constructor for new accounts with default balance
+  BankAccount.withDefaultBalance(String owner) : this(owner, 100.0);
+
+  // Redirecting constructor for zero balance account
+  BankAccount.empty(String owner) : this(owner, 0.0);
+}
+
+void main() {
+  var acc1 = BankAccount("Arnab", 500.0);
+  var acc2 = BankAccount.withDefaultBalance("Sakib");
+  var acc3 = BankAccount.empty("Rafi");
+
+  print("${acc1.owner} has \$${acc1.balance}");
+  print("${acc2.owner} has \$${acc2.balance}");
+  print("${acc3.owner} has \$${acc3.balance}");
+}
+```
+  
+``` dart
+class UserProfile {
+  String name;
+  String email;
+  int age;
+  // Main constructor
+  UserProfile(this.name, this.email, this.age);
+
+  // Redirecting constructors
+  UserProfile.google(String name, String email) : this(name, email, 0);
+  UserProfile.guest() : this("Guest", "unknown", 0);
+}
+
+void main() {
+  var fullUser = UserProfile("Arnab", "arnab@mail.com", 22);
+  var googleUser = UserProfile.google("Sakib", "sakib@gmail.com");
+  var guestUser = UserProfile.guest();
+  print("${fullUser.name}, ${googleUser.name}, ${guestUser.name}");
+}
+```
+
+**Generative constructor vs Factory constructor**
+| Feature | Generative Constructor | Factory Constructor |
+| --- | --- | --- |
+| Primary Goal | To generate a new object instance | To implement design patterns (like Singleton) and return a custom instance |
+| Object Return | Implicitly returns the new object; cannot use explicit return | Must explicitly return an instance of the class or subclass |
+| Instance Uniqueness | Always returns a new instance | Can return a new instance or an existing instance (e.g., from a cache) |
+| Type of Instance | Always returns an instance of the current class | Can return an instance of the current class or a subclass |
+| this Reference | Has access to `this`; can access instance members and initializer lists | No access to `this`; behaves like a static method |
+| Super Constructor | Can call the superclass's generative constructor using `super()` | Cannot call any superclass constructor using `super()` |
+| final Initialization | Cannot perform logic before initializing a `final` field | Can perform logic/calculations before calling a generative constructor to initialize `final` fields |
+  
+
+### Constructor Initialization
+
+A Dart constructor has five conceptual sections, but only three are used for field initialization. Conceptual Sections of a Constructor:
+- Name – Default or named constructor.
+- Parameter List / Field Initializer – `this.fieldName`.
+- Initializer List – `: fieldName = value`.
+- Redirecting Call – `: this.otherConstructorName()`.
+- Body – Code block in `{}`.
+
+**Main Field Initialization Techniques**
+| Technique | Syntax Example | Execution Order | Restrictions |
+| --- | --- | --- | --- |
+| Field Initializer | `Constructor(this.x, this.y)` | Executes before constructor body | Cannot be used with factory constructors or an initializer list |
+| Initializer List | `Constructor(a, b) : x = a, y = b;` | Executes before constructor body | Cannot be used with factory constructors or redirecting call |
+| Constructor Body | `Constructor(x, y) { this.x = x; }` | Executes last | Cannot initialize non-nullable or final fields unless marked `late` |
+
+**What to use when**
+  
+- Field Initializer: Used when the constructor parameters directly map to instance fields.
+- Initializer List: Used when you need to **compute or transform values** before assigning.
+``` dart
+class User {
+  String name;
+  int age;
+
+  // Initializer list used to modify data before assigning
+  User(String inputName, int inputAge)
+    : name = inputName.trim(),
+      age = inputAge < 0 ? 0 : inputAge {
+    print('Constructor body: name=$name, age=$age');
+  }
+}
+```
+- Constructor Body: Used when assignments or logic are too complex for the initializer list.
+``` dart
+class BankAccount {
+  String ownerName;
+  double balance;
+  BankAccount(String name, double initialDeposit) {
+    print('Constructor started');
+    // Validate and sanitize input
+    if (initialDeposit < 0) {
+      print('Negative deposit detected. Resetting to 0.');
+      initialDeposit = 0;
+    }
+    // Assign to fields
+    ownerName = name.trim();
+    balance = initialDeposit;
+
+    // Apply business logic
+    if (balance >= 10000) {
+      double bonus = balance * 0.02; // 2% bonus for high balance
+      balance += bonus;
+    }
+  }
+}
+```
+
+**Rule for Non-Nullable and Final Fields**
+
+Non-nullable or final fields must be initialized immediately when the object is created. Valid Initialization Stages:
+``` dart
+// Field Initializer
+class Point {
+  final int x;
+  final int y;
+  Point(this.x, this.y); // Field Initializer
+}
+
+// Initializer List
+class Point {
+  final int x;
+  final int y;
+  Point(int a, int b) : x = a, y = b; // Initializer List
+}
+
+// Invalid in Constructor Body
+class Point {
+  final int x;
+  final int y;
+  Point(int a, int b) {
+    x = a; // Error: final field cannot be assigned here
+    y = b; //Error
+  }
+}
+
+// Exception: late fields can be initialized in the constructor body
+
+class Point {
+  final int x;
+  final int y;
+  late int z;
+  Point(int a, int b, int c) : x = a, y = b {
+    z = c; // Allowed, late field
+  }
+}
+```
+
+Key Point: Always use Field Initializer or Initializer List for non-nullable/final fields unless the field is marked late.
+
+### Const Constructor
+
+A  const constructor is declared using the `const` keyword and is used to create compile-time constant objects.
+
+Core Concept: Canonical Instance
+-   When two objects are created with the same constant values, Dart **reuses** the same memory instance (canonical instance).  
+-   This reduces memory usage and improves performance.
+``` dart
+class Point {
+  final int x;
+  final int y;
+  const Point(this.x, this.y);
+}
+
+void main() {
+  const p1 = Point(10, 20);
+  const p2 = Point(10, 20);
+  print(identical(p1, p2)); // true → Both share the same instance
+}
+```
+
+**Rules for Const Constructors**
+| Rule | Description | Example |
+| --- | --- | --- |
+| All Fields Must Be final | Every field must be immutable. | `final int x;` |
+| Generative Only | Cannot be a factory constructor. | `const Point(this.x, this.y);` |
+| No Body | The constructor cannot have `{}`. | `const Point(this.x, this.y);` |
+| Const Instantiation | Use `const` when creating the object to make it compile-time constant. | `const Point(5, 10);` |
+
+**Benefits in Flutter**
+
+- **Memory Efficiency:** Constant objects are shared, not duplicated. Example: `const padding = EdgeInsets.all(16.0);` Flutter reuses this single object throughout the app.
+- **No Rebuilds:** Widgets declared as const don’t rebuild when their parent widget updates, improving performance. `const Text('Hello'); // This widget will not rebuild`
+
+Use const constructors and objects when:
+
+-   The data never changes.    
+-   You want to optimize rebuilds and memory usage, especially in flutter widgets.
+    
+## Static Variable & Static Method
+
+The `static` keyword in Dart defines **class-level members** that belong to the **class itself**, not to individual objects. These members are shared across all instances of the class.
+
+### Static Variables (Class Variables)
+
+A static variable has only one shared copy in memory for the entire class.
+Key Properties:
+- Single Copy: Shared by all objects of the class.
+- Memory Lifetime: Exists as soon as the class is loaded (even before any object is created).
+- Access: Accessed using the class name, not through an object.
+``` dart
+class Counter {
+  static int count = 0; // static variable shared by all objects
+  int id;
+  Counter(this.id) {
+    count++; // increments shared static variable
+  }
+  void show() {
+    print('Object $id created. Total objects: $count');
+  }
+}
+
+void main() {
+  var c1 = Counter(1);
+  var c2 = Counter(2);
+  c1.show();
+  c2.show();
+  print(Counter.count); // Access static variable using class name
+}
+```
+  
+### Static Methods
+
+A static method belongs to the class and can be called without creating an object.
+Purpose: Used for utility or helper operations that do not depend on instance data.
+``` dart
+class MathHelper {
+  static int square(int n) {
+    return n * n;
+  }
+
+  static void greet() {
+    print("Welcome to MathHelper");
+  }
+}
+
+void main() {
+  MathHelper.greet(); // Access static method directly_
+  print(MathHelper.square(5)); // Output: 25
+}
+```
+
+**Restrictions on Static Members**
+- Cannot Access Instance Members:	Static methods cannot use non-static variables or methods directly.
+``` dart
+class Example {
+  int value = 10;
+
+  static void show() {
+    print(value); // Error: Can’t access instance member
+  }
+}
+class Example {
+  int value = 10;
+  static void showValue(Example e) {
+    print(e.value); // OK, because you passed an instance
+  }
+}
+```
+- No `this` Reference: Static methods have no access to the current object (`this`).	`this.name` is invalid.
+- Not for Local or Global Use: `static` can only be used for class members, not inside functions or global variables.
+- Access Rule: Static members should be accessed via the class name, not objects.
+`ClassName.variable` is valid, but `object.variable` is invalid.
+
+Example
+``` dart
+import 'package:flutter/material.dart';
+
+class ThemeManager {
+  static Color primaryColor = Colors.blue; // static variable
+
+  static void toggleTheme() {
+    primaryColor = (primaryColor == Colors.blue)
+        ? Colors.green
+        : Colors.blue;
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ThemeManager.primaryColor,
+      appBar: AppBar(
+        title: const Text('Static Example'),
+        backgroundColor: ThemeManager.primaryColor,
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              ThemeManager.toggleTheme(); // change the static value
+            });
+          },
+          child: const Text('Change Theme'),
+        ),
+      ),
+    );
+  }
+}
+```
+Explanation: `ThemeManager.primaryColor` is shared globally. When you call `toggleTheme()`, it changes the static variable for every widget that uses it. You must still call `setState()` or trigger a rebuild to reflect UI changes, since Flutter’s widgets are immutable.
+``` dart
+class DatabaseHelper {
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
+  factory DatabaseHelper() => _instance;
+  DatabaseHelper._internal();
+
+  static Future<void> initDB() async {
+    print("Database initialized!");
+  }
+}
+
+await DatabaseHelper.initDB();
+```
+Explanation: This uses both **static variables** and the **singleton pattern**, perfect for managers that should have only one instance in the whole app.
+
+**Access Static Variable Using Object**
+
+A static variable (class variable) has a single shared copy for all class instances. It is conventionally accessed using the class name, e.g., _Test.count_. Direct access via an object instance (_t1.count_) is not allowed in Dart. However, you can indirectly access or modify static fields through non-static methods or non-static getters/setters.
+
+- Using Non-Static Methods:  Create **regular (instance) methods** that read or modify the static variable.
+``` dart
+class Test {
+  static int count = 0; // Static variable shared by all objects
+
+  // Instance method to get the value
+  int getCount() {
+    return count;
+  }
+
+  // Instance method to set the value
+  void setCount(int value) {
+    count = value;
+  }
+}
+
+void main() {
+  var t1 = Test();
+  var t2 = Test();
+
+  t1.setCount(10); // Indirectly modify static variable
+  print(t2.getCount()); // Access shared value via another object
+}
+```  
+
+Explanation: `setCount()` and `getCount()` are instance methods so that they can be called via objects. Both access the same static variable, so updating via one object affects all.  
+  
+- Using Non-Static Getters and Setters (Properties): Use Dart's property syntax (`get` and `set`) to make the static variable accessible through object properties.
+``` dart
+class Counter {
+  static int count = 0;
+
+  // Instance getter
+  int get countValue {
+    return count;
+  }
+
+  // Instance setter
+  set countValue(int value) {
+    count = value;
+  }
+}
+
+void main() {
+  var c1 = Counter();
+  var c2 = Counter();
+
+  c1.countValue = 20;   // Indirectly update static variable
+  print(c2.countValue);  // Read same static variable via another object
+}
+```
+  
+Explanation: Getters and setters are non-static, so they can be called using an object. They internally read/write the shared static field.
+
+## `this` and `this()`
+
+-   Simple `this` (Implicit Reference)    
+-   `this()` (Redirecting Constructor Call)
+
+ ### `this` - The Implicit Reference
+`this` refers to the current invoking object - the instance that called the method or constructor. It helps access instance members and resolve naming conflicts.
+- Resolve Name Conflict: Distinguishes between instance fields and local variables with the same name
+``` dart
+class Test {
+  int x = 10; // instance variable
+  void show() {
+    int x = 20; // local variable
+    print('x:$x'); // x:20
+    print('this.x:${this.x}'); // this.x:10
+  }
+}
+```
+- Pass Invoking Object: Passes the current object as a parameter to another method.
+``` dart
+class Person {
+  String name;
+
+  Person(this.name);
+
+  void introduce() {
+    Helper.showPerson(this); // 'this' means the current Person object
+  }
+}
+
+class Helper {
+  static void showPerson(Person p) {
+    print('Hello, my name is ${p.name}');
+  }
+}
+
+void main() {
+  var person = Person('Alice');
+  person.introduce();
+}
+```
+- Return Current Instance: Returns the same object, useful for method chaining.
+`return this;`
+- Constructor Initialization: Used in field initializers or shorthand constructor syntax (`this.x`). `Point(this.x, this.y);`
+
+
+Availability and Restrictions
+| Context | Availability | Restriction |
+| --- | --- | --- |
+| Methods / Constructors | Available in non-static methods and generative constructors | Not allowed in static methods or factory constructors |
+| Modification | Cannot be reassigned (e.g., `this = null` is illegal) | N/A |
+  
+
+### `this()` - Redirecting Constructor Call
+
+`this()` is used to **redirect one constructor** to another **within the same class**.
+
+| Aspect | Description |
+| --- | --- |
+| Purpose | Reuse constructor logic or simplify initialization |
+| Availability | Only inside initializer lists of generative constructors |
+| Restriction | Not allowed in static methods, factory constructors, or regular methods |
+
+Example: Redirecting Constructor
+``` dart
+class Person {
+  String name;
+  int age;
+
+  // Main constructor
+  Person(this.name, this.age);
+
+  // Redirecting constructor
+  Person.named(String name) : this(name, 18); // redirects to Person(this.name, this.age)
+}
+
+void main() {
+  var p1 = Person("Alice", 25);
+  var p2 = Person.named("Bob");
+
+  print("${p1.name}, ${p1.age}"); // Alice, 25
+  print("${p2.name}, ${p2.age}"); // Bob, 18
+}
+```
+
+Key Takeaways
+
+-  `this` - Refers to the current instance. Use it to access instance members, pass the invoking object, or enable method chaining.    
+-  `this()`  - Used inside constructors to redirect one constructor to another. Promotes code reuse and reduces duplication.
+    
+## Getters and Setters
+
+Getters and Setters are special methods in Dart that provide explicit read (get) and write (set) access to an object's properties, allowing you to execute logic during property access.
+``` dart
+class Example {
+  // Private field
+  int _value = 0;
+
+  // Getter
+  int get value => _value;
+
+  // Setter
+  set value(int newValue) {
+    _value = newValue;
+  }
+}
+
+var e = Example();
+e.value = 10; // calls setter
+print(e.value); // calls getter
+```
+| Feature | Getter (Accessor) | Setter (Mutator) |
+| --- | --- | --- |
+| Keyword | get | set |
+| Role | Reads a field's value | Updates a field's value |
+| Parameters | Takes no parameters | Takes exactly one parameter (the value being assigned) |
+| Return Type | Can have a return type (or defaults to dynamic) | Does not return a value (return type should be omitted) |
+| Access | Called like a property: `object.propertyName` | Called with assignment: `object.propertyName = value` |
+
+### Use case of Explicit Getters and Setters
+
+Explicit getters and setters are necessary when you need to introduce specific logic that implicit getters/setters cannot handle.
+
+**Input Validation:** Use a Setter to implement logic that checks the assigned value against rules (e.g., ensuring a person's age is greater than zero) before it is assigned to the field.
+``` dart
+class Person {
+  int _age = 0;
+  int get age => _age;
+
+  set age(int value) {
+    if (value <= 0) {
+      print('Age must be greater than zero');
+    } else {
+      _age = value;
+    }
+  }
+}
+void main() {
+  var p = Person();
+  p.age = -5;   // Invalid input
+  p.age = 25;   // Valid input
+  print(p.age); // Output: 25
+}
+```
+**Read-Only Fields:** Use a Getter for a private field (`_field`) without defining a corresponding setter. This allows outside code to read the value but prevents any modification, ensuring data security.
+``` dart
+class BankAccount {
+  double _balance = 1000;
+  double get balance => _balance; // Read-only
+  void deposit(double amount) {
+    _balance += amount;
+  }
+}
+
+void main() {
+  var account = BankAccount();
+  print(account.balance); // 1000
+  account.deposit(500);
+  print(account.balance); // 1500
+  // account.balance = 0;  // Error: no setter
+}
+```
+
+**Calculation-Based Values:** Use a Getter to perform a calculation based on one or more internal fields and return the result (e.g., calculating an employee's "Days of Work" from their joining date).
+``` dart
+class Employee {
+  DateTime joiningDate;
+
+  Employee(this.joiningDate);
+  int get daysOfWork {
+    final now = DateTime.now();
+    return now.difference(joiningDate).inDays;
+  }
+}
+
+void main() {
+  var emp = Employee(DateTime(2024, 1, 1));
+  print('Days worked: ${emp.daysOfWork}');
+}
+
+```
+
+**Programmer Convenience/Clarity:** Using the `get` and `set` keywords makes the code more aligned with Dart's conventions and is often clearer than using traditional `get...()` and `set...()` methods.
+``` dart
+class Temperature {
+  double _celsius = 0;
+  double get fahrenheit => (_celsius * 9 / 5) + 32;
+  set fahrenheit(double f) => _celsius = (f - 32) * 5 / 9;
+}
+void main() {
+  var t = Temperature();
+  t.fahrenheit = 98.6; // set in Fahrenheit
+  print(t.fahrenheit); // read in Fahrenheit
+}
+```
+**When not to use them**
+
+Avoid defining explicit getters and setters if they do nothing more than simply read or write the raw value of the field. This includes:
+
+-   **Public Fields:** They already have implicit getters/setters.    
+-   **Private Fields:** When the explicit setter/getter performs no validation or calculation logic.
+    
+
+## Inheritance
+
+Inheritance is an OOP concept where a child class (subclass) acquires properties and behaviors from a parent class (superclass). It allows code reuse and hierarchical organization.
+Keyword: `extends`
+
+Rule: The subclass inherits all members of the superclass except constructors.
+``` dart 
+import 'dart:convert';
+
+// Base class for API calls
+class ApiService {
+  final String baseUrl;
+
+  ApiService(this.baseUrl);
+
+  void get(String endpoint) {
+    // Simulated GET request
+    print('GET request to: $baseUrl$endpoint');
+  }
+
+  void post(String endpoint, Map<String, dynamic> data) {
+    // Simulated POST request
+    print('POST request to: $baseUrl$endpoint with data: ${jsonEncode(data)}');
+  }
+}
+
+// Subclass for User-related API calls
+class UserApi extends ApiService {
+  UserApi(String baseUrl) : super(baseUrl);
+
+  void getUser(int id) {
+    get('/users/$id'); // inherited GET method
+  }
+
+  void createUser(String name, String email) {
+    post('/users', {'name': name, 'email': email}); // inherited POST method
+  }
+}  
+```
+
+**Benefits of Inheritance** 
+| Benefit | Description | Example |
+| --- | --- | --- |
+| Code Reusability | Shared functionality lives in the superclass and is reused by subclasses. | Common methods like `display()` or `toString()`. |
+| Reduced Redundancy | Avoids writing duplicate code across similar classes. | In a Flutter app, `LoginButton`, `SubmitButton`, and `CancelButton` all inherit styling and tap-handling behavior from a shared `AppButton` base class. |
+| Class Hierarchy | Creates structured and logical relationships. | `Widget > StatelessWidget > MyWidget` |
+  
+
+**Types of Inheritance**
+| Type | Structure | Example |
+| --- | --- | --- |
+| Single | One superclass with one subclass | `LoginRepository extends BaseRepository` |
+| Multi-level | Chain of inheritance | `MyHomePage extends BasePage`, and `BasePage extends AppPage` |
+| Hierarchical | One superclass with multiple subclasses | In a Flutter app: `PrimaryButton extends AppButton`, `SecondaryButton extends AppButton`, both inheriting shared styling and behavior from `AppButton` |
+| Multiple | Not supported directly | Use mixins instead of multiple inheritance |
+
+
+### Class Relationships
+
+**IS-A Relationship (Inheritance)**
+
+The subclass is a specialized form of the superclass.
+``` dart
+// Base class: represents a general authenticated user
+class User {
+  String email;
+
+  User(this.email);
+
+  void login() {
+    print('$email logged in');
+  }
+
+  void logout() {
+    print('$email logged out');
+  }
+}
+
+// Subclass: Admin user
+class Admin extends User {
+  Admin(String email) : super(email);
+
+  void accessAdminPanel() {
+    print('$email is accessing the admin panel');
+  }
+}
+
+// Subclass: Regular user
+class RegularUser extends User {
+  RegularUser(String email) : super(email);
+
+  void browseContent() {
+    print('$email is browsing content');
+  }
+}
+
+void main() {
+  var admin = Admin('admin@example.com');
+  admin.login();               // inherited from User
+  admin.accessAdminPanel();    // specific to Admin
+
+  var user = RegularUser('user@example.com');
+  user.login();                // inherited from User
+  user.browseContent();        // specific to RegularUser
+}
+
+```
+
+**HAS-A Relationship (Association)**
+
+One class contains another as a member field. It can be aggregation or composition.
+
+``` dart
+class ThemeManager {
+  void applyDarkTheme() => print("Dark theme applied");
+}
+
+class UserProfileScreen {
+  // Screen can work even if ThemeManager changes or is replaced
+  ThemeManager theme = ThemeManager(); // aggregation
+  
+  void display() {
+    print("Showing user profile");
+    theme.applyDarkTheme();
+  }
+}
+
+void main() {
+  var screen = UserProfileScreen();
+  screen.display();
+}
+```
+Explanation: `UserProfileScreen` uses `ThemeManager`, but it can still function if you remove or replace the theme logic. Hence, a weak association (aggregation).
+
+``` dart
+class SQLiteHelper {
+  void connect() => print("Connected to SQLite database");
+}
+
+class DatabaseService {
+  final SQLiteHelper db = SQLiteHelper(); // composition
+  
+  void fetchData() {
+    db.connect();
+    print("Fetching user data...");
+  }
+}
+
+void main() {
+  var service = DatabaseService();
+  service.fetchData();
+}
+```
+Explanation: `DatabaseService` cannot work without  `SQLiteHelper`. The helper is an essential part of its functionality - this is composition.
+
+### Inheritance essentials
+**Core Inheritance Rules**
+
+-   **Why No Multiple Inheritance?** Dart does not support a class extending two others because it causes ambiguity in method calls (known as the "Diamond Problem"). The compiler can't decide which superclass method to use if they share the same name.
+-   **Constructors are Not Inherited:** Constructors must have the exact same name as their class. Inheriting a constructor with a different name would make no sense for the subclass.
+-   **Private Members are Inherited but Not Accessible:** Private members (prefixed with _) are technically inherited by the subclass. However, they cannot be accessed if the subclass is defined in a different library (file) due to Dart's library-level privacy rules.
+
+**Importance & Hierarchy**
+
+-   **Necessity in Flutter:** Inheritance is essential for Flutter, as every widget you create must extend either _StatelessWidget_ or _StatefulWidget_.
+-   **Universal Inheritance:** Every single class in Dart, even if you don't use extends, implicitly inherits from the Object class, making inheritance universal (except for the Null class).
+-   **Full Understanding:** Just learning the _extends_ keyword is not enough. You must also learn about Abstract Classes & Methods, Interfaces (implements), Mixins (with), and Constructors in Inheritance (super).
+
+**Architectural**
+-   **Why Arrows Point Upward:** The arrow in a UML diagram points from the subclass to the superclass because the subclass is the one explicitly stating it wants to extend/get the superclass's properties.
+-   **Danger of Copy-Paste:** Using copy-paste instead of inheritance leads to code redundancy and a critical maintenance issue: you must manually update the code in every location it was pasted.
+
+**Class Relationships**
+
+-   **Inheritance (Is-A):** This is the relationship where the subclass is a kind of the superclass (e.g., `AdminUser` is a `User`, inherits common user behavior like login, logout).
+-   **Composition & Aggregation (Has-A):** These are forms of Association (Has-A relationship), not inheritance.
+	-   **Aggregation (Weak Bounding):** Objects can exist independently (e.g., `AuthService` has a `Logger`, service works even if `logger` changes).
+	-   **Composition (Strong Bounding):** Objects are mutually dependent (e.g., `UserProfile` has `ProfileSettings`, it cannot exist without settings).
+    
+## Method Overriding and Runtime Polymorphism
+
+### Method Overriding
+When a subclass redefines a method already defined in its superclass with the same name, parameters, and return type.
+- Syntax Rule: The method signature must match exactly.
+- Annotation: Use `@override` to make the intent clear and avoid errors.
+
+Example: Basic Method Overriding
+``` dart
+// Base database service
+class DatabaseService {
+  void saveData(String data) {
+    print("Saving data to local database: $data");
+  }
+}
+
+// Subclass overrides method for cloud database
+class CloudDatabaseService extends DatabaseService {
+  @override
+  void saveData(String data) {
+    print("Uploading data to Firebase: $data");
+  }
+}
+
+// Another subclass for secure local storage
+class SecureDatabaseService extends DatabaseService {
+  @override
+  void saveData(String data) {
+    print("Encrypting and saving data securely: $data");
+  }
+}
+```  
+
+Example: Calling Superclass Method
+``` dart
+class Printer {
+  void printData() {
+    print('Printing data...');
+  }
+}
+
+class ColorPrinter extends Printer {
+  @override
+  void printData() {
+    super.printData(); // Call parent method
+    print('Printing in color...');
+  }
+}
+
+void main() {
+  var printer = ColorPrinter();
+  printer.printData();
+  // Output:
+  // Printing data...
+  // Printing in color...
+}
+``` 
+The subclass enhances the parent’s logic using `super.methodName()`.
+
+### Polymorphism
+Polymorphism allows a single reference type to behave differently based on the actual object it points to.
+
+Key Idea: A superclass reference can hold a subclass object, and the method that executes is chosen at runtime, not compile-time.
+| Type | Supported | Description |
+| --- | --- | --- |
+| Compile-Time Polymorphism | Not supported | No method overloading in Dart |
+| Runtime Polymorphism | Supported | Achieved through method overriding |
+
+
+**Runtime Polymorphism in Action**
+Example: Superclass Reference with Subclass Object
+``` dart
+// Base class: defines a common interface
+class DatabaseService {
+  void save(String data) {
+    print("Saving data (generic way): $data");
+  }
+}
+
+// Subclass: Local database (e.g., SQLite)
+class LocalDatabaseService extends DatabaseService {
+  @override
+  void save(String data) {
+    print("Saving to local SQLite DB: $data");
+  }
+}
+
+// Subclass: Cloud database (e.g., Firebase)
+class CloudDatabaseService extends DatabaseService {
+  @override
+  void save(String data) {
+    print("Uploading to Firebase: $data");
+  }
+}
+
+// Subclass: Secure encrypted storage
+class SecureDatabaseService extends DatabaseService {
+  @override
+  void save(String data) {
+    print("Encrypting and saving securely: $data");
+  }
+}
+
+void main() {
+  DatabaseService db; // Superclass reference
+
+  db = LocalDatabaseService();
+  db.save("User profile"); // Output: Saving to local SQLite DB: User profile
+
+  db = CloudDatabaseService();
+  db.save("User profile"); // Output: Uploading to Firebase: User profile
+
+  db = SecureDatabaseService();
+  db.save("User profile"); // Output: Encrypting and saving securely: User profile
+}
+```
+You might switch database types based on network availability or user settings. `DatabaseService` defines a generic interface `save()`. Each subclass (`LocalDatabaseService`, `CloudDatabaseService`, `SecureDatabaseService`) overrides `save()` with different implementations. The same call `db.save(data)` adapts automatically - local when offline, Firebase when online. This is runtime polymorphism in action: one interface, many behaviors, chosen dynamically.
+
+## Constructors in Inheritance
+
+### Core Principles
+
+-   **Implicit Super Call:** When a subclass object is created, the default (unnamed, zero-parameter) constructor of the superclass is always called automatically (implicitly) before the subclass's constructor runs. This ensures inherited members are initialized first.
+``` dart
+class DatabaseConnection {
+  DatabaseConnection() {
+    print("Database connected");
+  }
+}
+
+class UserService extends DatabaseConnection {
+  UserService() {
+    print("User service initialized");
+  }
+}
+
+void main() {
+  var service = UserService(); // Output: Database connected  User service initialized
+}
+```
+
+Explanation: `DatabaseConnection` might handle SQLite or Firebase initialization. `UserService` or `ProductService` depends on that setup to perform queries or API syncs. When `UserService()` is created, Dart automatically calls the superclass constructor (`DatabaseConnection()`) first. This ensures the database setup happens before the service starts using it.
+
+  
+
+-   **Explicit Super Call (`super()`):** The _super()_ keyword is used to explicitly call a specific constructor (named or parameterized) of the superclass. This is required if the superclass doesn't have a default constructor, or if you want to call a different one.
+``` dart
+class ApiService {
+  ApiService(String baseUrl) {
+    print("API Service initialized with base URL: $baseUrl");
+  }
+}
+
+class UserApiService extends ApiService {
+  // Explicitly call superclass constructor to pass API endpoint
+  UserApiService(String baseUrl) : super(baseUrl) {
+    print("User API Service ready");
+  }
+}
+
+void main() {
+  var userService = UserApiService("https://api.myapp.com/users");
+}
+// API Service initialized with base URL: https://api.myapp.com/users  
+// User API Service ready
+```
+Explanation: `ApiService` could manage base network setup (headers, authentication, logging). `UserApiService`, `ProductApiService`, etc., extend it and pass specific endpoints via `super()`. `UserApiService` uses `super(baseUrl)` to explicitly call that constructor.
+
+### Key Exclusions and Rules
+
+**Constructors are Not Inherited:** A superclass's constructor is not passed down to the subclass because a constructor's name must match its class name.
+``` dart
+class Person {
+  String name;
+
+  // Constructor in superclass
+  Person(this.name) {
+    print('Person constructor called');
+  }
+}
+
+class Employee extends Person {
+  int id;
+
+  // Subclass must call superclass constructor manually
+  Employee(this.id, String name) : super(name) {
+    print('Employee constructor called');
+  }
+}
+
+void main() {
+  var emp = Employee(101, 'Arnab');
+  print('Name: ${emp.name}, ID: ${emp.id}');
+}
+```
+
+**Abstract Class Constructor:** The constructor of an abstract class can and must still be called by its subclass.
+``` dart
+abstract class Shape {
+  Shape(String type) {
+    print('Shape constructor: $type');
+  }
+}
+
+class Circle extends Shape {
+  Circle() : super('Circle') {
+    print('Circle constructor');
+  }
+}
+
+void main() {
+  var c = Circle();
+}
+// Output:
+// Shape constructor: Circle
+// Circle constructor
+```
+
+**Interface Constructor:** The constructor of a class used as an interface (via implements) is not called.
+``` dart
+class AuthService {
+  // Constructor
+  AuthService() {
+    print('AuthService constructor called');
+  }
+
+  void login(String email, String password) {}
+}
+
+// Using the class as an interface
+class FirebaseAuthService implements AuthService {
+  FirebaseAuthService() {
+    print('FirebaseAuthService constructor called');
+  }
+
+  @override
+  void login(String email, String password) {
+    print('Firebase login for $email');
+  }
+}
+
+void main() {
+  var auth = FirebaseAuthService(); // FirebaseAuthService constructor called
+
+}
+```
+
+**Mutual Exclusion:** A single constructor cannot use both _this()_ (to call another constructor in the same class) and _super_ (to call a superclass constructor).
+``` dart
+class Person {
+  Person(String name) {
+    print('Person constructor: $name');
+  }
+}
+
+class Employee extends Person {
+  int id;
+
+  // Not allowed (example demonstration)
+  // Employee(this.id, String name) : this.fromName(name), super(name);
+
+  // Correct options:
+
+  // Option 1: Call another constructor in the same class
+  Employee.withId(this.id) : this.withName("Default Name");
+
+  // Option 2: Call superclass constructor
+  Employee.withName(String name) : super(name);
+}
+
+```
+
+**Initializer List Exclusion:** A constructor cannot call both `this()` and `super()` in the same initializer list. However, using an initializer list together with `super()` is allowed.
+``` dart
+class Person {
+  String name;
+  Person(this.name);
+}
+
+class Employee extends Person {
+  final int id;
+
+  Employee(this.id, String name)   // initializer list + super call
+      : assert(id > 0),           // initializer list
+        super(name);              // super call
+}
+```
+
+**Factory Constructor Limitations:** A factory constructor in a subclass cannot use `super()`. `super()` cannot call a factory constructor in the superclass.
+``` dart
+class Person {
+  Person() {
+    print("Person normal constructor");
+  }
+
+  factory Person.create() {
+    print("Person factory constructor");
+    return Person(); // OK: calls normal constructor inside factory
+  }
+}
+
+class Employee extends Person {
+  // Not allowed: factory cannot use super()
+  // factory Employee() : super();
+
+  // Valid factory
+  factory Employee() {
+    print("Employee factory constructor");
+    return Employee._internal();
+  }
+
+  Employee._internal() : super(); // private real constructor calls super
+}
+```
+
+## `super` and `super()`
+
+### `super` as an Implicit Reference
+
+`super` refers to the **immediate superclass object**. It’s used to access a **method**, **getter**, **setter**, or **field** of the superclass when it is **overridden or hidden** in the subclass.
+
+**Accessing Hidden Field** 
+``` dart
+class DatabaseConfig {
+  String dbName = "main_database";
+}
+
+class UserDatabase extends DatabaseConfig {
+  String dbName = "user_database";
+
+  void showNames() {
+    print("Child dbName = $dbName");       // child’s field
+    print("Parent dbName = ${super.dbName}"); // parent’s field
+  }
+}
+
+void main() {
+  var db = UserDatabase();
+  db.showNames(); // Child dbName = user_database Parent dbName = main_database
+}
+```
+
+**Accessing Overridden Method**
+``` dart
+class BaseScreen {
+  void initUI() {
+    print("Setting up base screen layout");
+  }
+}
+
+class HomeScreen extends BaseScreen {
+  @override
+  void initUI() {
+    print("Loading home-specific widgets");
+    super.initUI(); // Calls base setup after child customization
+  }
+}
+
+void main() {
+  var home = HomeScreen();
+  home.initUI(); // Loading home-specific widgets Setting up base screen layout
+}
+```
+
+### `super()` as a Constructor Call
+
+`super()` explicitly calls a **specific constructor** (default, named, or parameterized) of the **immediate superclass**. It must appear in the **initializer list** of a subclass constructor.
+``` dart
+class ApiService {
+  ApiService(String baseUrl) {
+    print("API Service initialized with base URL: $baseUrl");
+  }
+}
+
+class UserApiService extends ApiService {
+  // Explicitly call superclass constructor to pass API endpoint
+  UserApiService(String baseUrl) : super(baseUrl) {
+    print("User API Service ready");
+  }
+}
+
+void main() {
+  var userService = UserApiService("https://api.myapp.com/users");
+}
+// API Service initialized with base URL: https://api.myapp.com/users  
+// User API Service ready
+```  
+
+**Key Limitations and Rules**
+| Limitation | Rule / Explanation | Example / Note |
+| --- | --- | --- |
+| Static Access | `super` cannot access static members. | Use `ClassName.member` instead. |
+| Context of Use | `super` only valid in instance methods or generative constructors. | Not valid in static or top-level functions. |
+| Static / Factory Methods | `super` not allowed in static or factory methods. | Causes compile-time error. |
+| Immediate Superclass Only | `super` refers only to direct parent. | `super.super.x` invalid. |
+| Non-Assignable | `super` cannot be reassigned. | `super = obj;` illegal. |
+
+## Abstract Class and Abstract Method
+
+An **abstract class** is a class declared using the `abstract` keyword. It serves as a blueprint for other classes and cannot be instantiated directly because it may contain unimplemented (abstract) methods.
+
+An **abstract method** is a method declared without a body (that is, it has no `{}` block). Such methods only define a signature and must be implemented by subclasses. Abstract methods can only exist inside an **abstract class**.
+| Term | Definition | Key Rule |
+| --- | --- | --- |
+| Abstract Class | A class declared with the `abstract` keyword. | Cannot be instantiated directly; may contain abstract and non-abstract methods. |
+| Abstract Method | A method declared without a body. | Must be inside an abstract class; must be overridden in subclasses
+ 
+
+Abstract Class and Method
+``` dart
+abstract class Shape {
+  void draw(); // Abstract method
+
+  void info() {
+    print('This is a shape');
+  }
+}
+
+void main() {
+  // var s = Shape(); // Error: Cannot instantiate abstract class
+}
+```
+
+**Purpose of Abstract Classes**  
+
+Abstract classes define a **common structure or contract** for subclasses. They ensure consistency across multiple implementations.
+
+**Forcing Subclasses to Implement**
+
+``` dart
+// Abstract database repository
+abstract class DatabaseRepository {
+  Future<void> save(String key, String value); // abstract method
+  Future<String?> read(String key);           // abstract method
+}
+
+// Local SQLite implementation
+class LocalDatabase extends DatabaseRepository {
+  final Map<String, String> _storage = {};
+
+  @override
+  Future<void> save(String key, String value) async {
+    _storage[key] = value;
+    print("Saved '$value' locally with key '$key'");
+  }
+
+  @override
+  Future<String?> read(String key) async {
+    return _storage[key];
+  }
+}
+
+// Cloud Firebase implementation
+class CloudDatabase extends DatabaseRepository {
+  final Map<String, String> _cloudStorage = {};
+  @override
+  Future<void> save(String key, String value) async {
+    _cloudStorage[key] = value;
+    print("Saved '$value' to cloud with key '$key'");
+  }
+
+  @override
+  Future<String?> read(String key) async {
+    return _cloudStorage[key];
+  }
+}
+
+void main() async {
+  List<DatabaseRepository> databases = [
+    LocalDatabase(),
+    CloudDatabase(),
+  ];
+
+  for (var db in databases) {
+    await db.save("user_name", "Arnab");
+    print("Read: ${await db.read("user_name")}");
+  }
+}
+```
+
+**Usage with Inheritance**
+
+Extending an Abstract Class: A subclass must override all abstract methods of the parent class. Overriding non-abstract (concrete) methods is optional.
+``` dart
+import 'dart:convert';
+
+// Abstract base API class
+abstract class ApiService {
+  final String baseUrl;
+
+  // Constructor to set base API URL
+  ApiService(this.baseUrl);
+
+  // Abstract method — MUST be implemented by subclass
+  Future<void> getRequest(String endpoint);
+
+  // Concrete method — OPTIONAL for subclass to override
+  void log(String message) {
+    print('[API LOG] $message');
+  }
+}
+
+// Subclass for Auth API (e.g., login, profile)
+class AuthApiService extends ApiService {
+  // Pass baseUrl to parent constructor
+  AuthApiService(String baseUrl) : super(baseUrl);
+
+  // Implementing required abstract method
+  @override
+  Future<void> getRequest(String endpoint) async {
+    // Example GET request simulation
+    log('GET $baseUrl$endpoint'); // using concrete log() from parent
+    print('Fetching data from $baseUrl$endpoint');
+  }
+
+  // Additional auth-specific method
+  Future<void> login(String email, String password) async {
+    log('POST $baseUrl/login');
+    print('Logging in with: ${jsonEncode({'email': email, 'password': password})}');
+  }
+}
+
+void main() async {
+  // Creating API object
+  var authApi = AuthApiService('https://api.example.com');
+
+  // Required abstract method call (inherited + implemented)
+  await authApi.getRequest('/profile'); // will print fetch log
+
+  // Auth-specific API call
+  await authApi.login('arnab@example.com', '123456');
+}
+```
+
+**Not Implementing All Abstract Methods**
+If a subclass does not override all abstract methods, it must also be declared `abstract`
+``` dart
+abstract class Shape {
+  void draw();
+  void resize();
+}
+
+abstract class Rectangle extends Shape {
+  @override
+  void draw() => print('Drawing rectangle'); // resize() not implemented - must remain abstract
+  
+}
+```
+
+**Implementing an Abstract Class (Interface Use Case)**
+When a class `implements` an abstract class, it must override all methods both abstract and concrete ones.
+``` dart
+abstract class Printer {
+  void printData();
+  void connect() => print('Connecting...');
+}
+
+class InkjetPrinter implements Printer {
+  @override
+  void printData() => print('Inkjet printing...');
+  @override
+  void connect() => print('Inkjet connected');
+}
+
+void main() {
+  var printer = InkjetPrinter();
+  printer.connect();
+  printer.printData();
+}
+// Output:
+// Inkjet connected
+// Inkjet printing…
+```
+
+**Other Members in Abstract Classes**
+| Member Type | Allowed? | Explanation / Example |
+| --- | --- | --- |
+| Constructors | Allowed | Called indirectly through subclass constructors |
+| Static Members | Allowed | Accessed via class name (`ClassName.member`) |
+| Getters/Setters | Allowed | Subclasses can use or override them |
+ ``` dart
+ abstract class Device {
+  // Constructor
+  Device(String brand) {
+    print('Device brand: $brand');
+  }
+
+  // Abstract method
+  void start();
+
+  // Concrete method
+  void stop() => print('Device stopped');
+
+  // Static member
+  static void showInfo() => print('Device information');
+
+  // Getter
+  String get status => 'Ready';
+}
+
+class Phone extends Device {
+  Phone(String brand) : super(brand);
+
+  @override
+  void start() => print('Phone starting...');
+}
+
+void main() {
+  var phone = Phone('Samsung');
+  phone.start();       // from subclass
+  phone.stop();        // from superclass
+  print(phone.status); // getter
+  Device.showInfo();   // static method
+}
+// Output:
+// Device brand: Samsung
+// Phone starting...
+// Device stopped
+// Ready
+// Device information
+```
+
+## Interface
+
+An interface serves as a contract or specification that an implementing class must fulfill using the `implements` keyword. Dart does not have a specific interface keyword. Instead, every class (concrete or abstract) inherently acts as an interface.
+``` dart
+// Interface for Authentication service
+class AuthService {
+  void login(String email, String password) {}
+  void logout() {}
+}
+
+// Interface for Profile service
+class ProfileService {
+  void fetchProfile(int userId) {}
+  void updateProfile(int userId, Map<String, dynamic> data) {}
+}
+
+// Implementing both interfaces in one service
+class MyAppApi implements AuthService, ProfileService {
+  @override
+  void login(String email, String password) {
+    print("Logging in $email");
+  }
+
+  @override
+  void logout() {
+    print("Logging out");
+  }
+
+  @override
+  void fetchProfile(int userId) {
+    print("Fetching profile for user $userId");
+  }
+
+  @override
+  void updateProfile(int userId, Map<String, dynamic> data) {
+    print("Updating profile for user $userId with $data");
+  }
+
+  // Additional method not part of interfaces
+  void resetPassword(String email) {
+    print("Sending password reset link to $email");
+  }
+}
+
+void main() {
+  var api = MyAppApi();
+
+  // Auth methods
+  api.login("arnab@example.com", "123456");
+  api.logout();
+
+  // Profile methods
+  api.fetchProfile(1);
+  api.updateProfile(1, {"name": "Arnab"});
+
+  // Additional method
+  api.resetPassword("arnab@example.com");
+}
+
+```
+
+**Rules for implements**
+When a class implements an interface, it must follow strict rules:
+| Rule | Explanation |
+| --- | --- |
+| Mandatory Overriding | The implementing class must override all instance members (methods, fields, getters, and setters) of the interface. |
+| Static Members | Static members of the interface are not required to be overridden because they belong to the class, not the object instance. |
+| Constructors Ignored | The constructor of the interface class is NOT called when the implementing class is instantiated. |
+| No super Access | `super` cannot be used to access members of the implemented interface class, as it is not the superclass. |
+| Abstract Implementer | If the implementing class is abstract, it is not required to override the interface methods; concrete subclass must do so. |
+  
+**Practical Use Cases**
+
+The primary importance of interfaces in Dart is to overcome the language's lack of multiple inheritance:
+
+-   **Forcing Implementation:** It compels a class to provide its own version for all methods, ensuring a specific structure or behavior.
+    
+-   **Achieving Multiple Implementation:** This allows a class to implement multiple contracts simultaneously (e.g., `implements ClassA, ClassB`), effectively letting it inherit specifications from multiple sources.
+
+### Some questions regrading interface    
+
+1. Why Interface Methods Must Be Overridden
+
+When a class implements an interface, it inherits only the abstract signature of the methods, not the complete definition. Since the implementing class is typically a concrete class, it cannot contain abstract methods. Therefore, the concrete class is compulsory to provide a concrete implementation for all inherited abstract methods. In contrast, when a class extends another class, it inherits the complete method definition, making overriding optional.
+
+2. Implementing Multiple Interfaces
+
+Dart allows a class to implement multiple interfaces because of how method signatures are handled. When a class implements multiple interfaces, it only receives the abstract signatures of the methods from those interfaces. If both interfaces have a method with the same signature (e.g., `void test()`), the implementing class only needs to define the method once. This single definition satisfies the requirements of both interfaces, avoiding the ambiguity that prevents multiple extension.
+
+3. Implementing Multiple Interfaces with Conflicting Method Signatures
+
+It is not possible to implement multiple interfaces that contain methods with the same name but different signatures (e.g., different parameter lists). Dart does not support method overloading (having multiple methods with the same name but different parameters in the same class). Since the implementing class must override both methods, and they have the same name, a Dart class cannot fulfill this requirement, resulting in an error.
+
+4. Why Constructors Are Not Called
+
+Constructors of an interface are not called when an implementing class is instantiated. When a class extends a superclass, the superclass's constructor is called to initialize the inherited instance members. When a class implements an interface, the instance members are not inherited. Instead, the implementing class must override the members and is fully responsible for initializing its own instance variables. Therefore, there's no need to call the interface's constructor.
+
+5. Instance Variables in Interface
+
+When an interface contains instance variables, the implementing class must handle them in one of two ways:
+- Override the variable: Define a variable with the exact same name.
+- Define a Getter and Setter: Use different instance variable names internally, but define a getter and setter that use the exact name of the interface's instance variable.
+
+6. Static Members in Interface
+
+Static members (static methods and static variables) of an interface do not need to be overridden. Static members are part of the class, not part of any object instance. Since interfaces are concerned with instance behavior that must be implemented, and static members aren't instance members, they are not compulsory to override.
+
+7. Accessing Interface Members with `super`
+
+Members of an interface cannot be accessed using the `super` keyword from the implementing class. When you extend a class, the base class is truly a superclass, and super is used to call its implemented members. When you implement an interface, the Dart compiler treats the interface methods as abstract definitions (even if the class being used as an interface has implementations). The `super` keyword cannot be used to call abstract methods.
+
+**Key Differences Between `extends` and `implements`**
+| Feature | extends (Inheritance) | implements (Interface) |
+| --- | --- | --- |
+| Purpose | Inherits a class, making it a superclass. | Inherits a class as an interface. |
+| Method Definition | Subclass gets complete method definitions from the superclass. | Implementing class gets only abstract method declarations (signatures). |
+| Multiple Inheritance | Only one class can be extended (single inheritance). | Multiple interfaces can be implemented in a single class. |
+| Method Overriding | Optional for subclass. | Compulsory for the concrete class to override all interface methods. |
+| Constructor Call | Superclass constructor is called before subclass constructor. | Interface constructor is NOT called by the implementing class. |
+| super Keyword | Can access superclass members from subclass. | Cannot access interface members via `super`. |
+| Instance Fields (Variables) | Subclass inherits fields; no override needed. | Implementing class must override all instance fields or provide getters/setters. |
+| Guidance | Provides both concrete method guidance and specifications. | Provides only specifications (abstract methods). |
+
+## Mixin
+
+Mixins in Dart are a way of using the code of a class again in multiple class hierarchies. A mixin is a class whose methods & properties can be used by other classes without sub-classing. It is a reusable chunk of code that can be plugged into any class that needs this functionality.
+
+**Creating and Using Mixins**
+
+Dart offers two ways to create a mixin:
+- **Using a Regular Class:**  Any class can be used as a mixin if it follows two restrictions: (below Dart 3)
+	- It must not have any explicit constructor.
+	- It must not extend any class other than the default object class.
+``` dart
+// Regular class used as a mixin (no constructor, no superclass)
+class Logger {
+  void log(String message) {
+    final now = DateTime.now();
+    print('[$now] $message');
+  }
+}
+// Auth service using Logger functionality
+class AuthService with Logger {
+  void login(String user) {
+    log('User $user logged in.');
+  }
+}
+```
+- **Using the mixin Keyword:** This is the explicit and preferred way to create a mixin.
+``` dart
+// Explicit mixin for analytics tracking
+mixin AnalyticsTracker {
+  void trackEvent(String eventName, {Map<String, dynamic>? data}) {
+    print('Tracked Event: $eventName | Data: $data');
+  }
+}
+// Example UI widgets using the mixin
+class Button with AnalyticsTracker {
+  void onClick() {
+    trackEvent('button_click', data: {'button': 'login'});
+  }
+}
+```
+
+**Applying Multiple Mixins**
+``` dart
+// Handles REST API calls
+mixin ApiHandler {
+  Future<void> fetchData(String endpoint) async {
+    print('Fetching data from $endpoint ...');
+    await Future.delayed(Duration(seconds: 1));
+    print('Data fetched from $endpoint');
+  }
+}
+// Handles local cache logic
+mixin CacheHandler {
+  final Map<String, dynamic> _cache = {};
+  void saveToCache(String key, dynamic value) {
+    _cache[key] = value;
+    print('Saved "$key" to cache.');
+  }
+  dynamic readFromCache(String key) {
+    print('Reading "$key" from cache.');
+    return _cache[key];
+  }
+}
+// Handles analytics events
+mixin AnalyticsTracker {
+  void track(String event, {Map<String, dynamic>? data}) {
+    print('Event: $event | Data: $data');
+  }
+}
+class AuthService with ApiHandler, AnalyticsTracker {
+  Future<void> login(String user, String password) async {
+    await fetchData('/login');
+    track('login_attempt', data: {'user': user});
+    print('User $user logged in successfully.');
+  }
+}
+```
+
+### Mixin Features and Restrictions
+
+**Allowed in Mixins**
+
+- Instance and Static Variables (though instance variables must be accessed through the class that uses the mixin, as a mixin cannot be instantiated).
+- Concrete, Abstract, and Static Methods.    
+- Constants using `const` or `final`.    
+- A mixin can implement an interface.   
+- The class that uses the mixin can access mixin members using the 	`super` keyword.
+- A mixin can also be used as an interface by a class using the `implements` keyword instead of `with`.
+    
+**Not Allowed in Mixins**
+
+- Explicit Constructors.
+- Cannot be instantiated (cannot create an object of a mixin).
+- Cannot extend any class other than Object.
+- Cannot be extended by a class. 
+
+### Limiting Mixin Use (The `on` Keyword)
+
+The `on` keyword is used to restrict a mixin's use to a specific class and its subclasses:
+``` dart
+// Base class: common for all app users
+class User {
+  final String name;
+  User(this.name);
+}
+// Mixin restricted to subclasses of User only
+mixin AuthMixin on User {
+  void authenticate() {
+    print('$name is authenticated');
+  }
+}
+// Subclass representing an Admin user in the app
+class Admin extends User with AuthMixin {
+  Admin(String name) : super(name);
+  void accessDashboard() {
+    print('$name accessing admin dashboard');
+  }
+}
+// Irrelevant class: cannot use AuthMixin
+class Guest {
+  final String id;
+  Guest(this.id); // Cannot use "with AuthMixin" here
+}
+```
+Explanation: `User` class – represents all users in the app (base class). Example: a user could be an Admin, Customer, or Moderator. `mixin AuthMixin on Use` – the `on` keyword means only classes that extend `User` can use this mixin. It ensures that `authenticate()` can safely use properties of User because all subclasses of User have it. `Admin` class – extends User and uses `AuthMixin`. It inherits `authenticate()` automatically and adds custom logic like `accessDashboard()`. `Guest` class – not a subclass of `User`, so using `AuthMixin` here would cause a compile-time error.
+
+### Key Questions and Answers on Dart Mixins
+
+**Usage and Application**
+
+- **Multiple Mixins in One Class:** Yes, you can use multiple mixins with the `with` keyword (e.g., `class A with B, C`). If multiple mixins have a method with the same name, the method from the last mixin listed will override the others and be the one used by the class.
+- **Mixin, Superclass, and Same Method:** If a superclass and a mixin have the same method, the mixin's method will take precedence and override the superclass's method.
+- **Method Signature Conflicts:** It is not allowed for a class to use multiple mixins that contain the same method name but with different signatures (parameters). This results in a conflict because Dart does not support method overloading.
+- **Sequence of Keywords:** The correct sequence when using all three keywords in a class definition is:
+	- `extends` (for inheritance, must be first, one class only)
+	- `with` (for mixins)
+	- `implements` (for interfaces)
+
+Example: `class SubClass extends SuperClass with MixinA, MixinB implements InterfaceC`.
+
+- **Inheritance Level:** Yes, members incorporated from a mixin get inherited by the class's subclasses, following the standard level of inheritance.
+- **Mixin as a Parameter:** Yes, a method can have a mixin type as a parameter reference. You would pass an object of a concrete class that uses that mixin.
+
+**Definition and Structure**
+- **Constructors:** No, a mixin cannot define any explicit constructors.
+- **Instantiation:** No, you cannot create an object of a mixin; it cannot be instantiated.
+- **Extends vs. Implements:** A mixin cannot `extend` another class or another mixin. A mixin can `implement` an interface or another mixin, but this means it only inherits the method signatures, not the implementation.
+- **Using a Class as a Mixin:** Yes, a regular class can act as a mixin, provided it has no constructors and doesn't extend any class other than `Object.`
+- **Static Members:** Yes, mixins can have static variables and methods. They are accessed directly using the mixin name (e.g., `MixinName.staticMember`).
+- **`extends` or `implements` Mixin:** A class cannot `extend` a mixin. A class can `implement` a mixin to use it as an interface, in which case the class must override all of the mixin's methods.
+
+**Methods and Overriding**
+
+- **Abstract Methods:** Yes, mixins can contain abstract methods.
+- **Using Abstract Methods:** A concrete class that uses a mixin with abstract methods must override or implement all of them.
+- **Overriding Mixin Methods:** Yes, you can override a mixin's methods in the class that uses it. This is compulsory for abstract methods and optional for concrete methods.
+- **Accessing Mixin Members:** Yes, the class that uses the mixin can access the mixin's members (fields and methods) using the `super` keyword.
+
+**Purpose and Restriction**
+
+- **Multiple Inheritance:** No, mixins are not a tool for multiple inheritance. Their purpose is code reuse across different class hierarchies.
+- **Restricting Use:** Yes, you can restrict a mixin's use to a specific class and its subclasses by using the `on` keyword.
+- **Class, Interface, or Mixin:** All three are vital for OOP, but serve distinct roles: Classes define objects, Interfaces enforce contracts, and Mixins enable implementation sharing for code reuse.
+- **Abstract vs. Concrete Methods:** Both abstract and concrete methods can be written inside a mixin.
