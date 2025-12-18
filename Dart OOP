@@ -1,6 +1,6 @@
 # Dart OOP
 ## Introduction
-Object-Oriented Programming (OOP) in Dart is a programming paradigm that organizes code into **classes and objects**. A class defines a blueprint for creating objects that encapsulate **data (fields)** and **behaviour (methods)**. Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymorphism**, and **abstraction**. Encapsulation hides internal details and exposes only necessary functionality using access control. Inheritance allows one class to reuse and extend another class’s features using the `extends` keyword. Polymorphism enables a single interface to represent multiple types, often through method overriding. Abstraction simplifies complex systems by defining essential behaviour with **abstract classes** or **interfaces**. Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
+Object-Oriented Programming (OOP) in Dart is a programming paradigm that organizes code into **classes and objects**. A class defines a blueprint for creating objects that encapsulate **data (fields)** and **behavior (methods)**. Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymorphism**, and **abstraction**. Encapsulation hides internal details and exposes only necessary functionality using access control. Inheritance allows one class to reuse and extend another class’s features using the `extends` keyword. Polymorphism enables a single interface to represent multiple types, often through method overriding. Abstraction simplifies complex systems by defining essential behaviour with **abstract classes** or **interfaces**. Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
 
 ## Classes & Objects
 A blueprint or template that defines the structure and behavior of objects. It contains fields (data) and methods (behavior). An instance of a class that represents a specific entity (e.g., `Student`, `Book`, `Car`). A typical class definition contains
@@ -64,7 +64,7 @@ class Person {
 }
 ```
 
-Member Access: From outside of a class access through an object. From inside of a class access directly.
+Member Access: From outside of a class, members are accessed through an object. From inside the class, members can be accessed directly within class methods.
 ``` dart
 void main() {
   var p1 = Person('Alice', 25);
@@ -72,8 +72,12 @@ void main() {
 }
 
 // Inside class (no object needed):
-void showInfo() {
-  print('Name: $name'); // Accessing directly
+class Person {
+  String name = '';
+
+  void showInfo() {
+    print('Name: $name'); // Direct access inside class
+  }
 }
 ```  
 Memory Allocation: Each object has its own copy of instance variables, but methods are shared.
