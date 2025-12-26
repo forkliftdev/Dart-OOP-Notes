@@ -1,10 +1,16 @@
 # Dart OOP
 ## Introduction
-Object-Oriented Programming (OOP) in Dart is a programming paradigm that organizes code into **classes and objects**. A class defines a blueprint for creating objects that encapsulate **data (fields)** and **behavior (methods)**. Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymorphism**, and **abstraction**. Encapsulation hides internal details and exposes only necessary functionality using access control. Inheritance allows one class to reuse and extend another class’s features using the `extends` keyword. Polymorphism enables a single interface to represent multiple types, often through method overriding. Abstraction simplifies complex systems by defining essential behaviour with **abstract classes** or **interfaces**. Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
+Object-Oriented Programming (OOP) in Dart is a programming paradigm that organizes code into **classes and objects**. A class defines a blueprint for creating objects that encapsulate **data (fields)** and **behavior (methods)**. 
+Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymorphism**, and **abstraction**. 
+*Encapsulation hides internal details and exposes only necessary functionality using access control. 
+*Inheritance allows one class to reuse and extend another class’s features using the `extends` keyword. 
+*Polymorphism enables a single interface to represent multiple types, often through method overriding. 
+*Abstraction simplifies complex systems by defining essential behaviour with **abstract classes** or **interfaces**. 
+Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
 
 ## Classes & Objects
 A class is a blueprint, or template, that defines the structure and behavior of objects. It contains fields (data) and methods (behavior). An instance of a class that represents a specific entity (e.g., `Student`, `Book`, `Car`). A typical class definition contains
-`class` keyword followed by naming with PascalCase(e.g., `Student`, `PersonData`).
+`class` keyword followed by naming with PascalCase (e.g., `Student`, `PersonData`).
 
 Can Contain:
 
@@ -13,16 +19,21 @@ Can Contain:
 -   Constructors, Getters, Setters
     
 ``` dart
-class Student {
-  String? name;
-  int? age;
-
-  void display() {
-    print('Name: $name, Age: $age');
-  }
+// Top-level class definition
+class Notes {
+  String title = "Dart: Basic OOP";
+  String author = "Farhan";
+  String authorToo = "Chris";
 }
 
-Student s1 = Student(); // Object creation or instantiation
+void main() {
+/// In the following line: Notes defines the type, telling Dart that the variable myBook will contgain a Notes object.
+///This construction is just like that of a any other type: String or int, for ex, but this uses the class we defined earlier.
+ /// The following line is the instantiation of the class. It takes the above definition and creates a object named Notes.
+ Notes myBook = Notes();  // Object creation or instantiation
+  print(myBook.title);
+}
+
 ```
   
 **Behind the Scenes (Object Invocation)**
