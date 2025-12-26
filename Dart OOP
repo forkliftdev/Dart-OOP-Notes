@@ -9,7 +9,7 @@ Dart supports core OOP principles - **encapsulation**, **inheritance**, **polymo
 Together, these concepts make Dart code more modular, reusable, and easier to maintain - key advantages when building scalable Flutter applications.
 
 ## Classes & Objects
-A class is a blueprint, or template, that defines the structure and behavior of objects. It contains fields (data) and methods (behavior). An instance of a class that represents a specific entity (e.g., `Student`, `Book`, `Car`). A typical class definition contains
+A class is a blueprint, or template, that defines the structure and behavior of objects. It contains fields (data) and methods (behavior). An instance of a class that represents a specific entity (e.g., 'Notes," `Student`, `Book`, `Car`). A typical class definition contains
 `class` keyword followed by naming with PascalCase (e.g., `Student`, `PersonData`).
 
 Can Contain:
@@ -32,6 +32,28 @@ void main() {
  /// The following line is the instantiation of the class. It takes the above definition and creates a object named Notes.
  Notes myBook = Notes();  // Object creation or instantiation
   print(myBook.title);
+}
+
+```
+
+**Top-Level
+Variables, Functions and Classes in dart are "top-level" meaning that they are free-floating. They don't need to be nested inside another class. We can also say they are "open air." 
+Why? Dart identifies all the top-level objects before running the code. You can define the Notes class from the previous example before the main() funtion. Or you can define it after the last closing curly bracket of the main() function. See the following example:
+
+``` Dart
+void main() {
+/// In the following line: Notes defines the type, telling Dart that the variable myBook will contgain a Notes object.
+///This construction is just like that of a any other type: String or int, for ex, but this uses the class we defined earlier.
+ /// The following line is the instantiation of the class. It takes the above definition and creates a object named Notes.
+ Notes myBook = Notes();
+  print(myBook.title);
+}
+
+// Top-level class definition. Think of top-level as free-floating. It doesn't need to be defined at the 'top' of the file. It works art the bottom, too.
+class Notes {
+  String title = "Dart: Basic OOP";
+  String author = "Farhan";
+  String authorToo = "Chris";
 }
 
 ```
